@@ -1,0 +1,24 @@
+
+
+Data structure for 
+
+- formula
+- signed formula: sign + formula
+- problem: list of signed formulas
+   a problem is a special case of a tableau
+- branch: a list of signed formulas 
+- tableau: a tree of branches
+- proverOutput: answer (YES/NO) + tableau
+
+(prove a-tableau) --> returns a tableau
+ not granular
+
+Wouldn't be better
+(proveStep a-tableau) --> returns another tableau one step further
+
+(state a-tableau) --> returns closed/open-saturated/open-unsaturated
+
+
+Use TDD
+
+
