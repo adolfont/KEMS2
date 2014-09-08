@@ -1,0 +1,28 @@
+TODO
+
+## LINEAR, ONE-PREMISE RULES
+[X] F-NOT
+[X] T-NOT
+[X] T-AND
+[X] F-OR
+[X] F-IMPLIES
+
+## BRANCHING RULES
+[X] F-AND
+[X] T-OR
+[X] T-IMPLIES
+
+## OTHER RULES
+[ ] CLOSING
+[ ] PB
+
+## STRATEGY
+[ ] BASIC ALGORITHM
+[ ] MULTI-STRATEGIES
+
+
+Notes
+
+Is this a good way to see things?
+;; F A&B + T A = F B
+;; F A&B + T B = F A 
