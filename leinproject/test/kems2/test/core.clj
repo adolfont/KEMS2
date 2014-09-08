@@ -109,12 +109,16 @@
   (is (= (formula [:t [:and :a :b]]) [:and :a :b])))
   
 
+;; f-and-left  
+  
 (deftest f-and-left-1-not-applied
  (is (= (f-and-left [:f [:and :a :b]] [:f :a]) [:f [:and :a :b]])))
 
 (deftest f-and-left-2-applied
  (is (= (f-and-left [:f [:and :a :b]] [:t :a]) [:f :b])))
 
+;; f-and-right 
+ 
 (deftest f-and-right-1-not-applied
  (is (= (f-and-right [:f [:and :a :b]] [:t :a]) [:f [:and :a :b]])))
 
@@ -122,24 +126,99 @@
  (is (= (f-and-right [:f [:and :a :b]] [:t :b]) [:f :a])))
 
  
-(deftest new-f-and-left-1-not-applied
- (is (= (new-f-and-left [:f [:and :a :b]] [:f :a]) [:f [:and :a :b]])))
+;; t-or-left
 
-(deftest new-f-and-left-2-applied
- (is (= (new-f-and-left [:f [:and :a :b]] [:t :a]) [:f :b])))
+(deftest t-or-left-1-not-applied
+ (is (= (t-or-left [:t [:or :a :b]] [:t :a]) [:t [:or :a :b]])))
+
+(deftest t-or-left-2-applied
+ (is (= (t-or-left [:t [:or :a :b]] [:f :a]) [:t :b])))
+
+;; t-or-right
+ 
+(deftest t-or-right-1-not-applied
+ (is (= (t-or-right [:t [:or :a :b]] [:t :b]) [:t [:or :a :b]])))
+
+(deftest t-or-right-2-applied
+ (is (= (t-or-right [:t [:or :a :b]] [:f :b]) [:t :a])))
  
  
-(deftest new-f-and-right-1-not-applied
- (is (= (new-f-and-right [:f [:and :a :b]] [:t :a]) [:f [:and :a :b]])))
+;; t-or-left
 
-(deftest new-f-and-right-2-applied
- (is (= (new-f-and-right [:f [:and :a :b]] [:t :b]) [:f :a])))
+(deftest t-implies-left-1-not-applied
+ (is (= (t-implies-left [:t [:implies :a :b]] [:f :a]) [:t [:implies :a :b]])))
 
+(deftest t-implies-left-2-applied
+ (is (= (t-implies-left [:t [:implies :a :b]] [:t :a]) [:t :b])))
+
+;; t-or-right
  
- ;;   
-;; (deftest f-and-2-applied
-;;   (is (= (f-and [:f [:and :a :b]] [:t :a]) [:f :b])))
+(deftest t-implies-right-1-not-applied
+ (is (= (t-implies-right [:t [:implies :a :b]] [:t :b]) [:t [:implies :a :b]])))
 
-;; F A&B + T A = F B
-;; F A&B + T B = F A 
+(deftest t-implies-right-2-applied
+ (is (= (t-implies-right [:t [:implies :a :b]] [:f :b]) [:f :a]))) 
  
+ 
+;; closing rule auxiliary functions
+
+(deftest conjugate-formulas-1-test
+  (is (conjugate-formulas [:t :a] [:f :a]))
+)
+
+(deftest conjugate-formulas-2-test
+  (is (not (conjugate-formulas [:t :a] [:t :a])))
+)
+
+(deftest conjugate-formulas-3-test
+   (is (not (conjugate-formulas [:t :a] [:f :b])))
+)
+
+(deftest conjugate-formulas-1-test
+  (is (conjugate-formulas [:t [:and :a :b]] [:f [:and :a :b]]))
+)
+
+
+;; sign-is 
+
+(deftest sign-is-template-1-test
+  (is (sign-is-template :t [:t :a])))
+
+(deftest sign-is-template-2-test
+  (is (sign-is-template :f [:f :a])))
+  
+(deftest sign-is-template-3-test
+  (is (not (sign-is-template :f [:t :a]))))
+
+;; (deftest sign-is-true-1-test
+;;   (is (sign-is-true [:t :a])))
+;;   
+;; (deftest sign-is-true-2-test
+;;   (is (not (sign-is-true [:f :a]))))
+  
+
+(deftest select-formulas-by-sign-test-1
+  (is (= (select-formulas-by-sign :t [[:t :a]]) [[:t :a]])))
+
+(deftest select-formulas-by-sign-test-2
+  (is (= (select-formulas-by-sign :t [[:f :a]]) [])))
+
+(deftest select-formulas-by-sign-test-3
+  (is (= (select-formulas-by-sign :f [[:t :a] [:f :b] [:f [:and :a :c]]]) [[:f :b] [:f [:and :a :c]]])))
+  
+  
+  ;; closing rule
+
+(deftest closing-1-not-applied
+  (is (= (closing-rule [[:t :a] [:f :b]]) [[:t :a] [:f :b]])))
+  
+(deftest closing-2-applied
+  (is (= (closing-rule [[:t :a] [:f :a]]) [:closed])))
+
+(deftest closing-3-applied
+  (is (= (closing-rule [[:t :a] [:t [:and :a :b]] [:f :b] [:f [:and :a :b]]]) [:closed])))
+
+(deftest closing-4-not-applied
+  (is (= (closing-rule [[:t :a] [:t [:and :a :b]] [:f :b] [:t [:and :a :b]]]) [[:t :a] [:t [:and :a :b]] [:f :b] [:t [:and :a :b]]])))
+  
+  

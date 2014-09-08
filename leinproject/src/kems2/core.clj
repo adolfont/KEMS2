@@ -1,6 +1,5 @@
 (ns kems2.core)
 
-
  ;rules
 
 ; auxiliary functions
@@ -79,7 +78,7 @@
 (def f-implies (partial binary-connective-linear :f :implies :t :f))
 
 
-;; Auxiliary function for
+;; Auxiliary functions for
 ;; F-AND
 ;; T-OR
 ;; T-IMPLIES
@@ -95,34 +94,11 @@
 (defn formula [signed-formula]
   (second signed-formula))
 
-(defn f-and-left [main-premise auxiliary-premise]
-   (if (and 
-         (= (sign main-premise) :f)
-         (= (connective main-premise) :and)
-         (= (sign auxiliary-premise) :t)
-         (= (left-subformula main-premise) (formula auxiliary-premise))
-        )
-        [(sign main-premise) (right-subformula main-premise)]
-        main-premise
-   )
-)
-
-(defn f-and-right [main-premise auxiliary-premise]
-   (if (and 
-         (= (sign main-premise) :f)
-         (= (connective main-premise) :and)
-         (= (sign auxiliary-premise) :t)
-         (= (right-subformula main-premise) (formula auxiliary-premise))
-        )
-        [(sign main-premise) (left-subformula main-premise)]
-        main-premise
-   )
-)
-
 
 (defn binary-connective-two-premises [main-premise-sign main-premise-connective 
 	  auxiliary-premise-sign 
 	  auxiliary-subformula-function-extractor
+	  conclusion-sign
 	  conclusion-subformula-extractor
       main-premise auxiliary-premise]
    (if (and 
@@ -131,20 +107,63 @@
          (= (sign auxiliary-premise) auxiliary-premise-sign)
          (= (apply auxiliary-subformula-function-extractor [main-premise]) (formula auxiliary-premise))
         )
-        [(sign main-premise) (apply conclusion-subformula-extractor [main-premise])]
+        [conclusion-sign (apply conclusion-subformula-extractor [main-premise])]
         main-premise
    )
 )
 
-(def new-f-and-left (partial binary-connective-two-premises :f :and :t left-subformula right-subformula))
-(def new-f-and-right (partial binary-connective-two-premises :f :and :t right-subformula left-subformula))
+(def f-and-left (partial binary-connective-two-premises :f :and :t left-subformula :f right-subformula))
+(def f-and-right (partial binary-connective-two-premises :f :and :t right-subformula :f left-subformula))
 
-;; continuar fazendo o mesmo para T-OR
+;; T-OR
 
+(def t-or-left (partial binary-connective-two-premises :t :or :f left-subformula :t right-subformula))
+(def t-or-right (partial binary-connective-two-premises :t :or :f right-subformula :t left-subformula))
+
+;; T-IMPLIES
+
+(def t-implies-left (partial binary-connective-two-premises :t :implies :t left-subformula :t right-subformula))
+(def t-implies-right (partial binary-connective-two-premises :t :implies :f right-subformula :f left-subformula))
+
+;; closing rule auxiliary functions
+
+(defn conjugate-formulas [formula-1 formula-2]
+  (and 
+    (or 
+      (and (= (sign formula-1) :t) (= (sign formula-2) :f))
+      (and (= (sign formula-1) :f) (= (sign formula-2) :t))
+    )
+    (= (formula formula-1) (formula formula-2))
+  )
+)
+
+
+(defn sign-is-template [sign-symbol formula]
+   (= sign-symbol (sign formula)))
+   
+;; (def sign-is-true (partial sign-is-template :t))
+
+
+(defn select-formulas-by-sign [sign formulas]
+  (filter (partial sign-is-template sign) formulas)
+)
+
+;; closing rule 
+
+(defn ordered-intersect [a b] (filter (set b) a))  ;; from https://groups.google.com/forum/#!topic/clojure/uNZWCMbItS8
+
+(defn closing-rule [signed-formula-list] 
+  (if (not (empty? (ordered-intersect (map formula (select-formulas-by-sign :t signed-formula-list)) (map formula (select-formulas-by-sign :f signed-formula-list)))))
+      [:closed]
+      signed-formula-list))
+;  (println (ordered-intersect (map formula (select-formulas-by-sign :t [[:t :a] [:f :a]])) (map formula (select-formulas-by-sign :f [[:t :a] [:f :a]]))))
+      
+
+
+;; --- main ---
 
 (defn -main 
   "Hello, KEMS2!"
   [& args]
   (println "Hello, KEMS2!")
-;  (println (f-implies [:f [:implies :a :b]]))
 )
